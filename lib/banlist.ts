@@ -8,7 +8,7 @@ interface BanItemType {
 
 export function getBanlist():BanItemType[]{
     let banlist: BanItemType[] = [];
-    if (!fs.existsSync("banlist.json")) {
+    if (fs.existsSync("banlist.json")) {
         try {
             const banlist_json = fs.readFileSync("banlist.json").toString();
             banlist = JSON.parse(banlist_json);

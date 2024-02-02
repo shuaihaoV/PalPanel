@@ -1,7 +1,7 @@
 import NextAuth from 'next-auth';
 import { authConfig } from './auth.config';
 import Credentials from 'next-auth/providers/credentials';
-import bcrypt from 'bcrypt';
+import crypto from 'crypto';
 interface UserType {
   name?: string;
   id?: string;
@@ -17,7 +17,8 @@ declare module "next-auth" {
 
 async function authenticate(username: string, password: string) {
   if(!process.env.WEB_USERNAME || !process.env.WEB_PASSWORD) return null;
-  if(username === process.env.WEB_USERNAME && bcrypt.compareSync(password,process.env.WEB_PASSWORD)){
+  const hashedPassword = crypto.createHash('sha256').update(password).digest('hex');
+  if(username === process.env.WEB_USERNAME && hashedPassword === process.env.WEB_PASSWORD){
     const user:UserType = {
       id: username,
       name: username,

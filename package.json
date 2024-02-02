@@ -22,7 +22,6 @@
     "@radix-ui/react-slider": "^1.1.2",
     "@radix-ui/react-toast": "^1.1.5",
     "@tanstack/react-table": "^8.11.7",
-    "bcrypt": "^5.1.1",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.0",
     "country-flag-icons": "^1.5.9",
@@ -39,13 +38,11 @@
     "react-hook-form": "^7.49.3",
     "react-i18next": "^14.0.1",
     "sonner": "^1.4.0",
-    "steamapi": "^3.0.7",
     "tailwind-merge": "^2.2.1",
     "tailwindcss-animate": "^1.0.7",
     "zod": "^3.22.4"
   },
   "devDependencies": {
-    "@types/bcrypt": "^5.0.2",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",

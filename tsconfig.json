@@ -21,6 +21,6 @@
       "@/*": ["./*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx","types/**/*.ts", ".next/types/**/*.ts", "locales/TranslationsProvider.js", "next.config.mjs", "next.config.mjs", "middleware.js", "i18nConfig.js", "i18nConfig.js", "i18nConfig.js"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx","types/**/*.ts", ".next/types/**/*.ts", "next.config.mjs"],
   "exclude": ["node_modules"]
 }

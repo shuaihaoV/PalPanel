@@ -4,11 +4,8 @@ FROM base AS deps
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
-COPY package.json package-lock.json* ./
-RUN \
-    if [ -f package-lock.json ]; then npm ci; \
-    else echo "Lockfile not found." && exit 1; \
-    fi
+COPY package.json yarn.lock ./
+RUN yarn install
 
 FROM base AS builder
 WORKDIR /app
@@ -23,12 +20,7 @@ ENV WEB_USERNAME=""
 ENV WEB_PASSWORD=""
 ENV STEAM_API_KEY=""
 
-RUN \
-    if [ -f yarn.lock ]; then yarn run build; \
-    elif [ -f package-lock.json ]; then npm run build; \
-    elif [ -f pnpm-lock.yaml ]; then pnpm run build; \
-    else echo "Lockfile not found." && exit 1; \
-    fi
+RUN yarn build
 
 FROM base AS runner
 WORKDIR /app
@@ -45,17 +37,12 @@ ENV WEB_USERNAME=""
 ENV WEB_PASSWORD=""
 ENV STEAM_API_KEY=""
 
-RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 nextjs
-
 RUN mkdir .next
-RUN chown nextjs:nodejs .next
 
-COPY --from=builder --chown=nextjs:nodejs /app/public ./public
-COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
-COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
-COPY --from=builder --chown=nextjs:nodejs /app/.next/server ./.next/server
-USER nextjs
+COPY --from=builder /app/public ./public
+COPY --from=builder /app/.next/standalone ./
+COPY --from=builder /app/.next/static ./.next/static
+COPY --from=builder /app/.next/server ./.next/server
 
 EXPOSE 3000
 

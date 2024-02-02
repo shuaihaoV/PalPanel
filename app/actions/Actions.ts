@@ -2,10 +2,10 @@
 
 import { signIn, signOut } from "@/auth";
 import { AuthError } from "next-auth";
-import SteamAPI, { UserSummary } from 'steamapi';
 import { auth } from '@/auth';
 import { RconSocket } from "@/lib/rcon";
 import { addBanlist, getBanlist, removeBanlist } from "@/lib/banlist";
+import SteamAPI from "@/lib/steam";
 
 export interface ActionResponse {
     message: string;
@@ -193,38 +193,25 @@ export async function GetPlayerSummaries(id: string | string[]): Promise<PlayerS
         return [];
     }
     const steam = new SteamAPI(process.env.STEAM_API_KEY);
-    let steamIDs:string[] = [];
-    let res1: UserSummary | UserSummary[];
-    if (!Array.isArray(id)){
-        steamIDs = [id];
-    }else{
-        steamIDs = id;
-    }
-    let UserSummaryResult = await steam.getUserSummary(id);
+    let UserSummaryResult = await steam.getPlayerSummarys(id);
     let UserSummarys: PlayerSummarieResponse[] = [];
 
-    if (!Array.isArray(UserSummaryResult)) {
-        UserSummaryResult = [UserSummaryResult];
-    }
     UserSummarys = UserSummaryResult.map(item => {
         const tmp_item: PlayerSummarieResponse = {
-            steamID: item.steamID,
-            avatar: item.avatar.medium,
-            url: item.url,
-            nickname: item.nickname,
-            countryCode: item.countryCode,
+            steamID: item.steamid,
+            avatar: item.avatarmedium,
+            url: item.profileurl,
+            nickname: item.personaname,
+            countryCode: item.loccountrycode,
         }
         return tmp_item;
     })
 
-    let vacBannedResults = await steam.getUserBans(id);
-    if(!Array.isArray(vacBannedResults)){
-        vacBannedResults = [vacBannedResults];
-    }
+    let vacBannedResults = await steam.getPlayerBans(id);
     vacBannedResults.forEach(item => {
         const index = UserSummarys.findIndex(element => element.steamID === item.steamID);
         if (index !== -1) {
-            UserSummarys[index].vacBanned = item.vacBanned;
+            UserSummarys[index].vacBanned = item.VACBanned;
         }
     })
     return UserSummarys;

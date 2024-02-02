@@ -1,9 +1,10 @@
 version: "3.9"
 services:
   palpanel:
-    profiles: [ "no-proxy" ]
+    build: 
+      context: .
+      dockerfile: Dockerfile
     container_name: PalPanel
-    image: palpanel
     ports:
       - 3000:3000
     environment:
