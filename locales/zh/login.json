@@ -1,0 +1,9 @@
+{
+  "title": "登录",
+  "description": "登录到帕鲁控制面板",
+  "usernameLabel": "用户名",
+  "usernamePlaceholder": "请输入用户名",
+  "passwordLabel": "密码",
+  "passwordPlaceholder": "请输入密码",
+  "submitButtonText": "登录"
+}

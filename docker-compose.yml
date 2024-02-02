@@ -1,0 +1,16 @@
+version: "3.9"
+services:
+  palpanel:
+    profiles: [ "no-proxy" ]
+    container_name: PalPanel
+    image: palpanel
+    ports:
+      - 3000:3000
+    environment:
+      - RCON_HOST=$RCON_HOST
+      - RCON_PORT=$RCON_PORT
+      - RCON_PASSWORD=$RCON_PASSWORD
+      - AUTH_SECRET=$AUTH_SECRET
+      - WEB_USERNAME=$WEB_USERNAME
+      - WEB_PASSWORD=$WEB_PASSWORD
+      - STEAM_API_KEY=$STEAM_API_KEY

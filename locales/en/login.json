@@ -1,0 +1,9 @@
+{
+  "title": "Login",
+  "description": "Log in to the Paru Control Panel",
+  "usernameLabel": "Username",
+  "usernamePlaceholder": "Enter your username",
+  "passwordLabel": "Password",
+  "passwordPlaceholder": "Enter your password",
+  "submitButtonText": "Login"
+}
