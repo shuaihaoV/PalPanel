@@ -7,6 +7,8 @@ PalPanel 是基于Next.js实现的帕鲁服务器管理面板。通过RCON协议
 
 ![logo](./public/logo.png)
 
+</div>
+
 ## 特性
 
 - **在线用户管理**：查看当前在线用户，执行封禁或踢出操作。
@@ -112,4 +114,3 @@ docker compose up -d
 
 - 参考了[Bluefissure/pal-conf](https://github.com/Bluefissure/pal-conf/tree/main)项目的部分前端实现
 
-</div>

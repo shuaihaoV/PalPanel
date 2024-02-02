@@ -6,6 +6,8 @@ PalPanel is a PalWorld server management panel based on Next.js. Administrators 
 
 ![logo](./public/logo.png)
 
+</div>
+
 ## Features
 
 - **Online User Management**: View current online users and perform banning or kicking operations.
@@ -111,4 +113,3 @@ If you encounter issues or need assistance while using PalPanel, please contact 
 
 - Borrowed some frontend implementation from the [Bluefissure/pal-conf](https://github.com/Bluefissure/pal-conf/tree/main) project.
 
-</div>
