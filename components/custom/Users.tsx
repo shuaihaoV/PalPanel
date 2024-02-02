@@ -226,41 +226,41 @@ export default function UsersAccordionItem({refreshKey,setRefreshKey}:{refreshKe
     return [];
   }
   const handleGetUsers = async () => {
-    // ShowPlayersAction().then(result => {
-    //   if (result.ok) {
-    //     toast.success(t("users.getUserListSuccess"), {
-    //       description: result.message,
-    //       duration: 2000,
-    //       action: {
-    //         label: "X",
-    //         onClick: () => { },
-    //       },
-    //     });
-    //     processUserData(result);
-    //   } else {
-    //     toast.error(t("users.getUserListError"), {
-    //       description: result.message,
-    //       duration: 5000,
-    //       action: {
-    //         label: "X",
-    //         onClick: () => { },
-    //       },
-    //     });
-    //   }
-    // }).catch(error => {
-    //   toast.error(t("users.getUserListError"), {
-    //     description: error.message,
-    //     duration: 5000,
-    //     action: {
-    //       label: "X",
-    //       onClick: () => { },
-    //     },
-    //   });
-    // })
+    ShowPlayersAction().then(result => {
+      if (result.ok) {
+        toast.success(t("users.getUserListSuccess"), {
+          description: result.message,
+          duration: 2000,
+          action: {
+            label: "X",
+            onClick: () => { },
+          },
+        });
+        processUserData(result);
+      } else {
+        toast.error(t("users.getUserListError"), {
+          description: result.message,
+          duration: 5000,
+          action: {
+            label: "X",
+            onClick: () => { },
+          },
+        });
+      }
+    }).catch(error => {
+      toast.error(t("users.getUserListError"), {
+        description: error.message,
+        duration: 5000,
+        action: {
+          label: "X",
+          onClick: () => { },
+        },
+      });
+    })
 
     // Test data
-    const data = { message: "name,playeruid,steamid\nuser1,001,76561198146931523\nuser2,002,76561197961123267", ok: true }
-    processUserData(data);
+    // const data = { message: "name,playeruid,steamid\nuser1,001,76561198146931523\nuser2,002,76561197961123267", ok: true }
+    // processUserData(data);
   }
 
   const handleKickUser = async (steamID: string) => {
