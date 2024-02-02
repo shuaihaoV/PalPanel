@@ -1,0 +1,169 @@
+apiVersion: app.sealos.io/v1
+kind: Template
+metadata:
+  name: ${{ defaults.app_name }}
+spec:
+  gitRepo: https://github.com/shuaihaoV/PalPanel
+  templateType: inline
+  title: PalPanel
+  url: https://github.com/shuaihaoV/PalPanel
+  author: ShuaiHao
+  description:  PalPanel 是基于Next.js实现的帕鲁服务器管理面板。通过RCON协议，管理员可以轻松管理服务器，执行各种操作，包括用户管理、黑名单维护、存档保存等功能。 
+  readme: https://cdn.jsdelivr.us/gh/shuaihaoV/PalPanel@main/README.md
+  icon: https://cdn.jsdelivr.us/gh/shuaihaoV/PalPanel@main/public/favicon.ico
+  defaults:
+    app_host:
+      type: string
+      value: ${{ random(8) }}
+    app_name:
+      type: string
+      value: palpanel-${{ random(8) }}
+  inputs:
+    RCON_HOST:
+      description: 帕鲁服务器RCON IP地址
+      type: string
+      default: ''
+      required: true
+    RCON_PORT:
+      description: 帕鲁服务器RCON 端口
+      type: string
+      default: '25575'
+      required: true
+    RCON_PASSWORD:
+      description: 帕鲁服务器RCON 密码
+      type: string
+      default: ''
+      required: true
+    AUTH_SECRET:
+      description: Next.js 认证密钥,使用`openssl rand -base64 32`生成
+      type: string
+      default: ''
+      required: true
+    WEB_USERNAME:
+      description: PalPanel管理员用户名
+      type: string
+      default: 'admin'
+      required: true
+    WEB_PASSWORD:
+      description: PalPanel管理员密码(SHA256 哈希值)
+      type: string
+      default: ''
+      required: true
+    STEAM_API_KEY:
+      description: Steam API Key
+      type: string
+      default: ''
+      required: true
+  deployCount: 441
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ${{ defaults.app_name }}
+  annotations:
+    originImageName: shuaihaov/palpanel
+    deploy.cloud.sealos.io/minReplicas: '1'
+    deploy.cloud.sealos.io/maxReplicas: '1'
+  labels:
+    cloud.sealos.io/app-deploy-manager: ${{ defaults.app_name }}
+    app: ${{ defaults.app_name }}
+    cloud.sealos.io/deploy-on-sealos: ${{ defaults.app_name }}
+spec:
+  replicas: 1
+  revisionHistoryLimit: 1
+  selector:
+    matchLabels:
+      app: ${{ defaults.app_name }}
+  template:
+    metadata:
+      labels:
+        app: ${{ defaults.app_name }}
+    spec:
+      containers:
+        - name: ${{ defaults.app_name }}
+          image: shuaihaov/palpanel
+          env:
+            - name: RCON_HOST
+              value: ${{inputs.RCON_HOST}}
+            - name: RCON_PORT
+              value: ${{inputs.RCON_PORT}}
+            - name: RCON_PASSWORD
+              value: ${{inputs.RCON_PASSWORD}}
+            - name: AUTH_SECRET
+              value: ${{inputs.AUTH_SECRET}}
+            - name: WEB_USERNAME
+              value: ${{inputs.WEB_USERNAME}}
+            - name: WEB_PASSWORD
+              value: ${{inputs.WEB_PASSWORD}}
+            - name: STEAM_API_KEY
+              value: ${{inputs.STEAM_API_KEY}}
+          resources:
+            requests:
+              cpu: 100m
+              memory: 102Mi
+            limits:
+              cpu: 1000m
+              memory: 1024Mi
+          command: []
+          args: []
+          ports:
+            - containerPort: 3000
+          imagePullPolicy: Always
+          volumeMounts: []
+      volumes: []
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ${{ defaults.app_name }}
+  labels:
+    cloud.sealos.io/app-deploy-manager: ${{ defaults.app_name }}
+    cloud.sealos.io/deploy-on-sealos: ${{ defaults.app_name }}
+spec:
+  ports:
+    - port: 3000
+  selector:
+    app: ${{ defaults.app_name }}
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ${{ defaults.app_name }}
+  labels:
+    cloud.sealos.io/app-deploy-manager: ${{ defaults.app_name }}
+    cloud.sealos.io/app-deploy-manager-domain: ${{ defaults.app_host }}
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/proxy-body-size: 32m
+    nginx.ingress.kubernetes.io/server-snippet: |
+      client_header_buffer_size 64k;
+      large_client_header_buffers 4 128k;
+    nginx.ingress.kubernetes.io/ssl-redirect: 'false'
+    nginx.ingress.kubernetes.io/backend-protocol: HTTP
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+    nginx.ingress.kubernetes.io/client-body-buffer-size: 64k
+    nginx.ingress.kubernetes.io/proxy-buffer-size: 64k
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      if ($request_uri ~* \.(js|css|gif|jpe?g|png)) {
+        expires 30d;
+        add_header Cache-Control "public";
+      }
+spec:
+  rules:
+    - host: ${{ defaults.app_host }}.${{ SEALOS_CLOUD_DOMAIN }}
+      http:
+        paths:
+          - pathType: Prefix
+            path: /()(.*)
+            backend:
+              service:
+                name: ${{ defaults.app_name }}
+                port:
+                  number: 3000
+  tls:
+    - hosts:
+        - ${{ defaults.app_host }}.${{ SEALOS_CLOUD_DOMAIN }}
+      secretName: ${{ SEALOS_CERT_SECRET_NAME }}
