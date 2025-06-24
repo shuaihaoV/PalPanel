@@ -45,9 +45,124 @@ Before using PalPanel, ensure that your game server has enabled the RCON protoco
 - `STEAM_API_KEY`: The secret key for the Steam API, obtained from the [Steam official website](https://steamcommunity.com/dev/apikey).
   Add these environment variables to your project. You can use a .env file or the configuration interface of the deployment platform to set these variables.
 
+## Build Guide
+
+This comprehensive guide will help you build and deploy PalPanel. Choose the method that best suits your needs.
+
+### Prerequisites
+
+Before building PalPanel, ensure you have the following software installed:
+
+#### For Local Development:
+- **Node.js** (version 18 or higher): [Download Node.js](https://nodejs.org/)
+- **Yarn** package manager: [Install Yarn](https://yarnpkg.com/getting-started/install)
+- **Git**: [Download Git](https://git-scm.com/downloads)
+
+#### For Docker Deployment:
+- **Docker**: [Install Docker](https://docs.docker.com/get-docker/)
+- **Docker Compose** (optional): [Install Docker Compose](https://docs.docker.com/compose/install/)
+
+### Method 1: Local Development Setup
+
+Perfect for development, testing, or running PalPanel without Docker.
+
+#### Step 1: Clone the Repository
+```bash
+# Clone the repository
+git clone https://github.com/shuaihaoV/PalPanel.git
+cd PalPanel
+```
+
+#### Step 2: Install Dependencies
+```bash
+# Install project dependencies
+yarn install
+```
+
+#### Step 3: Configure Environment Variables
+```bash
+# Copy the environment template
+cp .env .env.local
+
+# Edit the environment file with your settings
+# On Windows: notepad .env.local
+# On Linux/macOS: nano .env.local
+```
+
+Set the following variables in `.env.local`:
+```env
+RCON_HOST=your-palworld-server-ip
+RCON_PORT=25575
+RCON_PASSWORD=your-rcon-password
+AUTH_SECRET=your-generated-secret
+WEB_USERNAME=admin
+WEB_PASSWORD=your-hashed-password
+STEAM_API_KEY=your-steam-api-key
+```
+
+#### Step 4: Generate Required Secrets
+```bash
+# Generate AUTH_SECRET (copy the output to your .env.local file)
+openssl rand -base64 32
+
+# Generate WEB_PASSWORD hash (replace "your-password" with your desired password)
+echo -n "your-password" | sha256sum | awk '{print $1}'
+```
+
+#### Step 5: Run Development Server
+```bash
+# Start the development server
+yarn dev
+```
+
+The application will be available at `http://localhost:3000`
+
+#### Step 6: Build for Production (Optional)
+```bash
+# Build the application for production
+yarn build
+
+# Start the production server
+yarn start
+```
+
+### Method 2: Building from Source with Docker
+
+Build your own Docker image from the source code.
+
+#### Step 1: Clone and Build
+```bash
+# Clone the repository
+git clone https://github.com/shuaihaoV/PalPanel.git
+cd PalPanel
+
+# Build the Docker image
+docker build -t palpanel:custom .
+```
+
+#### Step 2: Run Your Custom Image
+```bash
+# Generate required secrets
+AUTH_SECRET=$(openssl rand -base64 32)
+WEB_PASSWORD=$(echo -n "your-password" | sha256sum | awk '{print $1}')
+
+# Run the container
+docker run -d \
+  --name PalPanel \
+  -p 3000:3000 \
+  -e RCON_HOST=your-palworld-server-ip \
+  -e RCON_PORT=25575 \
+  -e RCON_PASSWORD=your-rcon-password \
+  -e AUTH_SECRET=$AUTH_SECRET \
+  -e WEB_USERNAME=admin \
+  -e WEB_PASSWORD=$WEB_PASSWORD \
+  -e STEAM_API_KEY=your-steam-api-key \
+  palpanel:custom
+```
+
 ## Deployment Guide
 
-### 1. Docker Deployment
+### 1. Docker Deployment (Recommended)
 
 ```bash
 # Generate AUTH_SECRET
@@ -81,6 +196,57 @@ vim .env
 docker compose up -d
 # For some versions, use docker-compose up -d
 ```
+
+### Troubleshooting
+
+#### Common Issues and Solutions
+
+**Issue: "AUTH_SECRET is required"**
+```bash
+# Generate a new AUTH_SECRET
+openssl rand -base64 32
+```
+
+**Issue: "Connection refused" or RCON errors**
+- Verify your PalWorld server has RCON enabled
+- Check that RCON_HOST and RCON_PORT are correct
+- Ensure RCON_PASSWORD matches your server configuration
+- Verify firewall settings allow connections to the RCON port
+
+**Issue: "Invalid credentials" when logging in**
+```bash
+# Regenerate password hash
+echo -n "your-actual-password" | sha256sum | awk '{print $1}'
+```
+
+**Issue: Docker build fails with network errors**
+- This can happen in restricted environments
+- Try pulling the pre-built image instead: `docker pull shuaihaov/palpanel:latest`
+
+**Issue: "Permission denied" errors**
+```bash
+# On Linux/macOS, you might need to run Docker commands with sudo
+sudo docker run ...
+```
+
+**Issue: Port 3000 already in use**
+```bash
+# Use a different port
+docker run -p 8080:3000 ...
+# Then access via http://localhost:8080
+```
+
+**Issue: Environment variables not loading**
+- Ensure `.env` file is in the same directory as docker-compose.yml
+- Check that variable names match exactly (case-sensitive)
+- Restart the container after changing environment variables
+
+#### Getting Help
+
+If you encounter issues not covered here:
+1. Check the [Issues](https://github.com/shuaihaoV/PalPanel/issues) page for similar problems
+2. Enable debug logging by setting `NODE_ENV=development`
+3. Check Docker logs: `docker logs PalPanel`
 
 ## Multi-Language Support
 
